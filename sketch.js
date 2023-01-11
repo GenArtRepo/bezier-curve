@@ -9,6 +9,10 @@
 * Find Pomax's in depth tutorial here:
 * https://pomax.github.io/bezierinfo/
 * 
+* The algorithm is implemented as a series of interpolations between vertices of a
+* polyline.
+* 
+* 
 * 
 */
 
@@ -19,10 +23,7 @@ let b;
 // Settings, values used in the algorithm execution
 let settings = {
   Type:"linear", 
-  // Reset: function(){ init(); },
-  // Len: 200,
-  // Angle: 30,
-  // Iteration: 0,
+  Interpolation:0.5,
 };
 
 function gui(){
@@ -30,14 +31,9 @@ function gui(){
   var gui = new dat.GUI();
   gui.width = 150;
   gui.add(settings, "Type", ["linear", "quadratic", "cubic"]).onChange(function () {init()});
-  // gui.add(settings,'Generate');
-  // gui.add(settings,'Reset');
-  // gui.add(settings,'Len', 50, 500).step(1);
-  // gui.add(settings,'Angle', -180, 180);
+  gui.add(settings, "Interpolation", 0.01,0.99).step(0.01).onChange(function () {draw()});
   
 }
-// // run gui
-// gui();
 
 
 
@@ -50,10 +46,6 @@ function setup() {
   gui();
   // add control points
   init();
-
-  // b = new Bezier(controlPoints, 50, 'cubic');
-  // b.init();
-  // console.log(b.curve);
 }
 
 function draw() {
@@ -77,6 +69,9 @@ function draw() {
   for(let v of b.curve){
     vertex(v.x, v.y);
   }
+  let mid = b.curve[int(b.curve.length * settings.Interpolation)];
+  // console.log(mid);
+  ellipse(mid.x, mid.y, 8, 8);
   endShape();
 }
 
@@ -101,7 +96,7 @@ function init(){
   for(let i = 0; i < n; i++){
     controlPoints.push(new ControlPoint(random(width), random(height)));
   }
-  b = new Bezier(controlPoints, 50, 'cubic');
+  b = new Bezier(controlPoints, 100, 'cubic');
   console.log("init called");
 }
 
